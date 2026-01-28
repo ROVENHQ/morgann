@@ -1,0 +1,956 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <base target="_self" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Morgann</title>
+    <meta name="description" content="Un message sincère, sans attente" />
+    <style>
+      /* Base reset */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family:
+          'Inter',
+          system-ui,
+          -apple-system,
+          sans-serif;
+      }
+
+      :root {
+        --primary-white: #fef7ff;
+        --soft-pink: #ffb6e1;
+        --light-pink: #ffd6ec;
+        --accent-pink: #ff85c0;
+        --text-dark: #5a3d5c;
+        --text-light: #8a6b8c;
+        --glass-white: rgba(255, 255, 255, 0.85);
+        --glass-border: rgba(255, 182, 225, 0.3);
+        --transition-spring: 550ms cubic-bezier(0.34, 1.56, 0.64, 1);
+        --transition-smooth: 450ms cubic-bezier(0.16, 1, 0.3, 1);
+        --shadow-soft: 0 20px 40px rgba(255, 182, 225, 0.15);
+        --shadow-glow: 0 0 30px rgba(255, 133, 192, 0.2);
+      }
+
+      body {
+        min-height: 100vh;
+        background: linear-gradient(
+          135deg,
+          var(--primary-white),
+          var(--light-pink),
+          var(--soft-pink)
+        );
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+        padding: 20px;
+      }
+
+      /* Subtle floating blobs */
+      .blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.4;
+        z-index: 0;
+        animation: float 20s infinite ease-in-out;
+      }
+
+      .blob-1 {
+        width: 300px;
+        height: 300px;
+        background: var(--soft-pink);
+        top: 5%;
+        left: 5%;
+        animation-delay: 0s;
+      }
+
+      .blob-2 {
+        width: 400px;
+        height: 400px;
+        background: var(--light-pink);
+        bottom: 5%;
+        right: 5%;
+        animation-delay: 3s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+        33% {
+          transform: translate(40px, -40px) scale(1.1);
+        }
+        66% {
+          transform: translate(-30px, 30px) scale(0.9);
+        }
+      }
+
+      /* Micro hearts */
+      .micro-heart {
+        position: absolute;
+        opacity: 0.08;
+        font-size: 16px;
+        color: var(--accent-pink);
+        z-index: 0;
+        animation: heartFloat 25s infinite linear;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      @keyframes heartFloat {
+        0% {
+          transform: translateY(100vh) rotate(0deg) scale(0.8);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.08;
+        }
+        90% {
+          opacity: 0.08;
+        }
+        100% {
+          transform: translateY(-100px) rotate(360deg) scale(0.8);
+          opacity: 0;
+        }
+      }
+
+      /* Screens container */
+      .screens-container {
+        position: relative;
+        width: 100%;
+        max-width: 560px;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      /* Screen */
+      .screen {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: translateX(40px);
+        pointer-events: none;
+        transition: all var(--transition-spring);
+        z-index: 1;
+      }
+
+      .screen.active {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: all;
+      }
+
+      .screen.exiting {
+        opacity: 0;
+        transform: translateX(-40px);
+        pointer-events: none;
+      }
+
+      /* Main card */
+      .card {
+        background: var(--glass-white);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1.5px solid var(--glass-border);
+        border-radius: 28px;
+        padding: 48px 40px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: var(--shadow-soft);
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 32px;
+        min-height: 380px;
+        justify-content: center;
+      }
+
+      /* Typography */
+      .title {
+        font-size: 3.2rem;
+        font-weight: 700;
+        background: linear-gradient(90deg, var(--accent-pink), #ff6bb5);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        letter-spacing: -0.5px;
+        line-height: 1;
+        margin-bottom: 8px;
+      }
+
+      .intro-text {
+        font-size: 1.4rem;
+        color: var(--text-dark);
+        line-height: 1.5;
+        font-weight: 500;
+        max-width: 400px;
+      }
+
+      .message-text {
+        font-size: 1.2rem;
+        color: var(--text-dark);
+        line-height: 1.6;
+        max-width: 420px;
+        font-weight: 400;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .message-line {
+        opacity: 0;
+        transform: translateY(10px);
+        animation: lineAppear 0.6s var(--transition-smooth) forwards;
+        margin-bottom: 1rem;
+        width: 100%;
+        text-align: center;
+      }
+
+      @keyframes lineAppear {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Continue arrow */
+      .continue-arrow {
+        margin-top: 20px;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1.5px solid var(--glass-border);
+        color: var(--accent-pink);
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all var(--transition-smooth);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: fadeInUp 0.5s ease-out 0.5s forwards;
+        box-shadow: 0 4px 15px rgba(255, 182, 225, 0.2);
+      }
+
+      .continue-arrow:hover {
+        background: white;
+        border-color: var(--accent-pink);
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 6px 20px rgba(255, 182, 225, 0.3);
+      }
+
+      .continue-arrow:active {
+        transform: translateY(0) scale(0.98);
+        transition-duration: 200ms;
+      }
+
+      .arrow-icon {
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+      }
+
+      .continue-arrow:hover .arrow-icon {
+        transform: translateX(3px);
+      }
+
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Buttons */
+      .button-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+        width: 100%;
+        gap: 12px;
+      }
+
+      .button {
+        padding: 18px 48px;
+        border-radius: 100px;
+        border: none;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition-smooth);
+        position: relative;
+        overflow: hidden;
+        min-width: 200px;
+        outline: none;
+        transform-origin: center;
+      }
+
+      .button-primary {
+        background: linear-gradient(135deg, var(--accent-pink), #ff6bb5);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 20px rgba(255, 133, 192, 0.3);
+      }
+
+      .button-primary:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 30px rgba(255, 133, 192, 0.4);
+      }
+
+      .button-primary:active {
+        transform: translateY(0) scale(0.98);
+        transition-duration: 200ms;
+        box-shadow: 0 2px 15px rgba(255, 133, 192, 0.3);
+      }
+
+      .button-secondary {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1.5px solid var(--glass-border);
+        color: var(--text-dark);
+        box-shadow: 0 4px 15px rgba(255, 182, 225, 0.2);
+      }
+
+      .button-secondary:hover {
+        transform: translateY(-2px);
+        background: white;
+        border-color: var(--accent-pink);
+        box-shadow: 0 6px 20px rgba(255, 182, 225, 0.3);
+      }
+
+      /* Restart button */
+      .restart-button {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1.5px solid rgba(255, 182, 225, 0.4);
+        color: var(--text-light);
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 100;
+        opacity: 0;
+        transform: translateY(10px);
+        pointer-events: none;
+      }
+
+      .restart-button.visible {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: all;
+      }
+
+      .restart-button:hover {
+        background: white;
+        border-color: var(--accent-pink);
+        color: var(--accent-pink);
+        transform: translateY(-2px);
+      }
+
+      /* Mission accomplished screen */
+      .mission-text {
+        font-size: 2.2rem;
+        font-weight: 700;
+        background: linear-gradient(90deg, var(--accent-pink), #ff6bb5);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 16px;
+      }
+
+      .sub-message {
+        font-size: 1.1rem;
+        color: var(--text-light);
+        line-height: 1.5;
+        max-width: 380px;
+        margin-bottom: 32px;
+      }
+
+      /* Responsive */
+      @media (max-width: 640px) {
+        .screens-container {
+          padding: 16px;
+        }
+
+        .card {
+          padding: 40px 28px;
+          border-radius: 24px;
+          gap: 28px;
+          min-height: 340px;
+        }
+
+        .title {
+          font-size: 2.8rem;
+        }
+
+        .intro-text {
+          font-size: 1.2rem;
+        }
+
+        .message-text {
+          font-size: 1.1rem;
+          min-height: 180px;
+        }
+
+        .continue-arrow {
+          padding: 10px 20px;
+          font-size: 0.95rem;
+        }
+
+        .button {
+          padding: 16px 40px;
+          min-width: 180px;
+          font-size: 1.05rem;
+        }
+
+        .mission-text {
+          font-size: 2rem;
+        }
+
+        .restart-button {
+          bottom: 20px;
+          right: 20px;
+          padding: 8px 16px;
+          font-size: 0.85rem;
+        }
+      }
+
+      @media (max-width: 400px) {
+        .title {
+          font-size: 2.4rem;
+        }
+
+        .intro-text {
+          font-size: 1.1rem;
+        }
+
+        .message-text {
+          font-size: 1rem;
+        }
+
+        .card {
+          padding: 36px 24px;
+          min-height: 320px;
+        }
+
+        .continue-arrow {
+          padding: 8px 16px;
+          font-size: 0.9rem;
+        }
+
+        .button {
+          padding: 14px 36px;
+          min-width: 160px;
+          font-size: 1rem;
+        }
+
+        .mission-text {
+          font-size: 1.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Subtle blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Micro hearts -->
+    <div class="micro-heart" style="left: 10%; animation-delay: 0s">❤</div>
+    <div class="micro-heart" style="left: 90%; animation-delay: 8s">❤</div>
+    <div class="micro-heart" style="left: 30%; animation-delay: 16s">❤</div>
+
+    <!-- Screens container -->
+    <div class="screens-container">
+      <!-- Screen 1: Intro -->
+      <div class="screen screen-1 active" id="screen1">
+        <div class="card">
+          <h1 class="title">Morgann</h1>
+          <div class="intro-text">Petite attention pour toi, petit hibou.</div>
+          <div class="button-container">
+            <button class="button button-primary" id="nextBtn1">Découvrir</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 2: Main message -->
+      <div class="screen screen-2" id="screen2">
+        <div class="card">
+          <div class="message-text" id="messageText">
+            <!-- Will be filled dynamically -->
+          </div>
+          <div class="button-container">
+            <button class="button button-primary" id="nextBtn2" style="display: none">
+              Pourquoi j'ai fait ça ?
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 3: Explanation -->
+      <div class="screen screen-3" id="screen3">
+        <div class="card">
+          <div class="message-text" id="explanationText">
+            <!-- Will be filled dynamically -->
+          </div>
+          <div class="button-container">
+            <button class="button button-primary" id="nextBtn3">Continuer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 4: Final message -->
+      <div class="screen screen-4" id="screen4">
+        <div class="card">
+          <div class="message-text" id="finalText">
+            <!-- Will be filled dynamically -->
+          </div>
+          <div class="button-container">
+            <button class="button button-primary" id="smileBtn">Ça m'a fait sourire 🙂</button>
+            <button class="button button-secondary" id="crazyBtn">T'es un peu con 😂</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 5: Mission accomplished -->
+      <div class="screen screen-5" id="screen5">
+        <div class="card">
+          <div class="mission-text">Mission accomplie !</div>
+          <div class="sub-message" id="missionMessage">
+            <!-- Will be filled dynamically -->
+          </div>
+          <div class="button-container">
+            <button class="button button-primary" id="closeBtn">Retour</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Restart button -->
+    <button class="restart-button" id="restartBtn">Revoir depuis le début</button>
+
+    <script>
+      // Screen elements
+      const screens = {
+        screen1: document.getElementById('screen1'),
+        screen2: document.getElementById('screen2'),
+        screen3: document.getElementById('screen3'),
+        screen4: document.getElementById('screen4'),
+        screen5: document.getElementById('screen5'),
+      };
+
+      // Message elements
+      const messageText = document.getElementById('messageText');
+      const explanationText = document.getElementById('explanationText');
+      const finalText = document.getElementById('finalText');
+      const missionMessage = document.getElementById('missionMessage');
+
+      // Buttons
+      const nextBtn1 = document.getElementById('nextBtn1');
+      const nextBtn2 = document.getElementById('nextBtn2');
+      const nextBtn3 = document.getElementById('nextBtn3');
+      const smileBtn = document.getElementById('smileBtn');
+      const crazyBtn = document.getElementById('crazyBtn');
+      const closeBtn = document.getElementById('closeBtn');
+      const restartBtn = document.getElementById('restartBtn');
+
+      // Message content
+      const messages = {
+        screen2: {
+          part1: [
+            'Franchement, t’es une très bonne personne.',
+            'Avec un bon cœur, et une vraie force.',
+            'Et surtout… t’as un humour un peu zinzin,',
+            'mais c’est exactement pour ça qu’on t’aime 😂',
+          ],
+          part2: ['Alors ne doute jamais de toi.', 'Que Dieu te bénisse 🤍'],
+        },
+        screen3: [
+          'Aucune raison précise.',
+          "Je t'apprécie beaucoup, c'est tout.",
+          "Et j'avais envie de te le dire autrement qu'avec un message.",
+        ],
+        screen4: [
+          'Voilà.',
+          'J’espère que ça t’a fait sourire.',
+          'Je voulais juste que tu saches que t’es quelqu’un de bien.',
+        ],
+        screen5: {
+          smile: 'Ton sourire est précieux 💖',
+          crazy: 'Un peu con mais tellement attachant 😂',
+        },
+      };
+
+      // Variables
+      let currentScreen = 'screen1';
+      let isTransitioning = false;
+      let selectedReaction = '';
+      let continueArrow = null;
+
+      // Transition between screens
+      function goToScreen(nextScreenId) {
+        if (isTransitioning) return;
+        isTransitioning = true;
+
+        const currentScreenElement = screens[currentScreen];
+        const nextScreenElement = screens[nextScreenId];
+
+        // Exit current screen
+        currentScreenElement.classList.add('exiting');
+        currentScreenElement.classList.remove('active');
+
+        // Show restart button after first screen
+        if (nextScreenId === 'screen2') {
+          setTimeout(() => {
+            restartBtn.classList.add('visible');
+          }, 300);
+        }
+
+        // Enter next screen
+        setTimeout(() => {
+          currentScreenElement.classList.remove('exiting');
+          nextScreenElement.classList.add('active');
+          currentScreen = nextScreenId;
+          isTransitioning = false;
+
+          // Initialize content for the new screen
+          initializeScreen(nextScreenId);
+        }, 400);
+      }
+
+      // Initialize screen content
+      function initializeScreen(screenId) {
+        switch (screenId) {
+          case 'screen2':
+            initializeScreen2();
+            break;
+          case 'screen3':
+            initializeScreen3();
+            break;
+          case 'screen4':
+            initializeScreen4();
+            break;
+          case 'screen5':
+            initializeScreen5();
+            break;
+        }
+      }
+
+      // Initialize screen 2 with continue arrow
+      function initializeScreen2() {
+        messageText.innerHTML = '';
+        nextBtn2.style.display = 'none';
+
+        // Remove existing continue arrow if any
+        if (continueArrow) {
+          continueArrow.remove();
+          continueArrow = null;
+        }
+
+        // Show part 1
+        messages.screen2.part1.forEach((line, index) => {
+          const lineElement = document.createElement('div');
+          lineElement.className = 'message-line';
+          lineElement.textContent = line;
+
+          setTimeout(() => {
+            messageText.appendChild(lineElement);
+          }, index * 400);
+        });
+
+        // After part 1, show continue arrow
+        setTimeout(
+          () => {
+            createContinueArrow();
+          },
+          messages.screen2.part1.length * 400 + 500,
+        );
+      }
+
+      // Create continue arrow button
+      function createContinueArrow() {
+        continueArrow = document.createElement('button');
+        continueArrow.className = 'continue-arrow';
+        continueArrow.innerHTML = 'Suite <span class="arrow-icon">→</span>';
+
+        continueArrow.addEventListener('click', () => {
+          addClickEffect(continueArrow);
+          showPart2();
+        });
+
+        messageText.parentNode.insertBefore(continueArrow, messageText.nextSibling);
+      }
+
+      // Show part 2 of screen 2
+      function showPart2() {
+        // Remove continue arrow
+        if (continueArrow) {
+          continueArrow.remove();
+          continueArrow = null;
+        }
+
+        // Clear and show part 2
+        messageText.innerHTML = '';
+
+        messages.screen2.part2.forEach((line, index) => {
+          const lineElement = document.createElement('div');
+          lineElement.className = 'message-line';
+          lineElement.textContent = line;
+
+          setTimeout(() => {
+            messageText.appendChild(lineElement);
+          }, index * 450);
+        });
+
+        // Show main button after part 2
+        setTimeout(
+          () => {
+            nextBtn2.style.display = 'block';
+            nextBtn2.style.animation = 'fadeInUp 0.5s ease-out forwards';
+          },
+          messages.screen2.part2.length * 450 + 300,
+        );
+      }
+
+      // Initialize screen 3
+      function initializeScreen3() {
+        explanationText.innerHTML = '';
+
+        messages.screen3.forEach((line, index) => {
+          const lineElement = document.createElement('div');
+          lineElement.className = 'message-line';
+          lineElement.textContent = line;
+
+          setTimeout(() => {
+            explanationText.appendChild(lineElement);
+          }, index * 400);
+        });
+      }
+
+      // Initialize screen 4
+      function initializeScreen4() {
+        finalText.innerHTML = '';
+
+        messages.screen4.forEach((line, index) => {
+          const lineElement = document.createElement('div');
+          lineElement.className = 'message-line';
+          lineElement.textContent = line;
+
+          setTimeout(() => {
+            finalText.appendChild(lineElement);
+          }, index * 400);
+        });
+      }
+
+      // Initialize screen 5
+      function initializeScreen5() {
+        missionMessage.textContent = messages.screen5[selectedReaction];
+      }
+
+      // Show mission accomplished screen
+      function showMissionAccomplished(reactionType) {
+        selectedReaction = reactionType;
+        goToScreen('screen5');
+
+        // Add subtle celebration effect
+        createSubtileHeartGlow();
+      }
+
+      // Create subtle heart glow effect
+      function createSubtileHeartGlow() {
+        for (let i = 0; i < 3; i++) {
+          const heart = document.createElement('div');
+          heart.textContent = '❤';
+          heart.style.position = 'fixed';
+          heart.style.fontSize = '20px';
+          heart.style.color = 'var(--accent-pink)';
+          heart.style.opacity = '0.7';
+          heart.style.pointerEvents = 'none';
+          heart.style.zIndex = '1001';
+          heart.style.filter = 'blur(1px)';
+
+          // Random position around center
+          const centerX = window.innerWidth / 2;
+          const centerY = window.innerHeight / 2;
+          const angle = Math.random() * Math.PI * 2;
+          const distance = 80 + Math.random() * 60;
+
+          heart.style.left = `${centerX + Math.cos(angle) * distance}px`;
+          heart.style.top = `${centerY + Math.sin(angle) * distance}px`;
+
+          document.body.appendChild(heart);
+
+          // Animate
+          heart.animate(
+            [
+              {
+                transform: 'scale(0.5)',
+                opacity: 0.7,
+              },
+              {
+                transform: 'scale(1.2)',
+                opacity: 0,
+              },
+            ],
+            {
+              duration: 1000,
+              easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+            },
+          );
+
+          // Remove after animation
+          setTimeout(() => heart.remove(), 1000);
+        }
+      }
+
+      // Button click effects
+      function addClickEffect(button) {
+        button.style.transform = 'scale(0.95)';
+        button.style.boxShadow = '0 0 30px rgba(255, 133, 192, 0.4)';
+
+        setTimeout(() => {
+          button.style.transform = '';
+          button.style.boxShadow = '';
+        }, 200);
+      }
+
+      // Reset to initial state
+      function resetExperience() {
+        // Hide all screens except screen1
+        Object.values(screens).forEach((screen) => {
+          screen.classList.remove('active', 'exiting');
+        });
+
+        // Show screen1
+        screens.screen1.classList.add('active');
+        currentScreen = 'screen1';
+
+        // Hide restart button
+        restartBtn.classList.remove('visible');
+
+        // Clear all message content
+        messageText.innerHTML = '';
+        explanationText.innerHTML = '';
+        finalText.innerHTML = '';
+        missionMessage.textContent = '';
+
+        // Remove continue arrow if exists
+        if (continueArrow) {
+          continueArrow.remove();
+          continueArrow = null;
+        }
+
+        // Reset button visibility
+        nextBtn2.style.display = 'none';
+
+        // Reset reaction
+        selectedReaction = '';
+      }
+
+      // Create additional micro hearts
+      function createMicroHearts() {
+        const container = document.body;
+        for (let i = 0; i < 4; i++) {
+          const heart = document.createElement('div');
+          heart.className = 'micro-heart';
+          heart.textContent = '❤';
+          heart.style.left = `${Math.random() * 90 + 5}%`;
+          heart.style.animationDelay = `${Math.random() * 20}s`;
+          heart.style.fontSize = `${Math.random() * 12 + 12}px`;
+          container.appendChild(heart);
+        }
+      }
+
+      // Event listeners
+      nextBtn1.addEventListener('click', () => {
+        addClickEffect(nextBtn1);
+        setTimeout(() => {
+          goToScreen('screen2');
+        }, 200);
+      });
+
+      nextBtn2.addEventListener('click', () => {
+        addClickEffect(nextBtn2);
+        setTimeout(() => {
+          goToScreen('screen3');
+        }, 200);
+      });
+
+      nextBtn3.addEventListener('click', () => {
+        addClickEffect(nextBtn3);
+        setTimeout(() => {
+          goToScreen('screen4');
+        }, 200);
+      });
+
+      smileBtn.addEventListener('click', () => {
+        addClickEffect(smileBtn);
+        setTimeout(() => {
+          showMissionAccomplished('smile');
+        }, 200);
+      });
+
+      crazyBtn.addEventListener('click', () => {
+        addClickEffect(crazyBtn);
+        setTimeout(() => {
+          showMissionAccomplished('crazy');
+        }, 200);
+      });
+
+      // MODIFICATION: Le bouton "Retour" ramène au screen 4
+      closeBtn.addEventListener('click', () => {
+        addClickEffect(closeBtn);
+        setTimeout(() => {
+          goToScreen('screen4');
+        }, 200);
+      });
+
+      restartBtn.addEventListener('click', () => {
+        resetExperience();
+      });
+
+      // Add hover effect to all buttons
+      const buttons = document.querySelectorAll('.button, .restart-button, .continue-arrow');
+      buttons.forEach((button) => {
+        button.addEventListener('mouseenter', function () {
+          this.style.transform = 'translateY(-2px) scale(1.03)';
+        });
+
+        button.addEventListener('mouseleave', function () {
+          this.style.transform = 'translateY(0) scale(1)';
+        });
+      });
+
+      // Initialize
+      createMicroHearts();
+
+      console.log('Message interactif chargé - pour Morgann 💖');
+    </script>
+  </body>
+</html>
